@@ -2,11 +2,13 @@
 """Boot the ROM in ares n64-run to a race and check every segment's text against RDRAM.
 
 Each segment's text must match RAM word for word (at least 99%) in one of the
-checkpoints that tools/to_race.script saves. Exit 1 on failure.
+checkpoints that tools/to_race.script saves. Exit 1 on failure. The run's PI DMA
+log lands in build/runtime/dma.log.
 
 usage: verify_runtime.py [--n64-run PATH]
 """
 import argparse
+import os
 import shutil
 import subprocess
 import sys
@@ -35,7 +37,7 @@ def main() -> None:
     shutil.rmtree(work, ignore_errors=True)
     work.mkdir(parents=True)
     subprocess.run([a.n64_run, "--script", str(ROOT / "tools/to_race.script"), "--wall-seconds", "600", str(ROM_PATH)],
-                   cwd=work, check=True, capture_output=True)
+                   cwd=work, check=True, capture_output=True, env=dict(os.environ, ARES_PILOG=str(work / "dma.log")))
     rom = ROM_PATH.read_bytes()
     rams = {s: extract_rdram(rom, (work / f"{s}.bst").read_bytes()) for s in STATES}
     failed = False

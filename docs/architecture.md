@@ -5,7 +5,7 @@ How the game's code is organized at runtime. Each claim cites an address and its
 Evidence tags:
 
 - **[code]** decompiled pseudocode in `build/c/<view>/functions/0xADDR.c`, or objdump disassembly of the ROM.
-- **[log N]** line N of `build/rt/game.pilog` (boot-to-race PI DMA log; cart = 0x10000000 + ROM offset).
+- **[log N]** line N of `build/runtime/dma.log`, the PI DMA log `tools/verify_runtime.py` writes on its boot-to-race run (deterministic; cart = 0x10000000 + ROM offset).
 - **[rom]** bytes read from `ROM/Cruis'n USA.z64`.
 - **inferred** means the reading fits the code but nothing confirmed it.
 
@@ -171,7 +171,7 @@ Entry format, big-endian (shifts and masks at low 0x800004F0..0x80000560):
 
 **Cache.** `asset_cache_alloc` puts an 8-byte header {u16 idx, u16 size/8-1} below each block and grows down from `DAT_80146590` [code]. When the region above the framebuffers fills, it wraps to start below 0x100000. `asset_find` walks those headers. `asset_mark_get`/`asset_mark_set` (0x80000A64/0x80000A74) save and restore `DAT_80146590`. `asset_load_list(idx, out)` (0x8000078C) loads asset idx as a 0xFFFF-terminated u16 list of further indices and loads each one. `boot_init` calls `asset_load_list(700, ...)`.
 
-**Check against runtime** (`tools/assets.py ROM build/rt/game.pilog`): 2516 of 2518 8-byte table reads are immediately followed by a DMA of the decoded ROM address and length (window 0x17F0 with the stored size for compressed entries). In the other 2, a 2 KB read from the sample region lands in between, and the expected asset DMA follows it ([log 356619] then [log 356621]; [log 357563] then [log 357565]). The first table read is entry 0x2BD [log 339662], matching `asset_load(0x2bd)` in `boot_init`. A second run (attract mode only, `build/rt/nav.pilog`) gives 1591 of 1591.
+**Check against runtime** (`tools/assets.py ROM build/runtime/dma.log`): 2516 of 2518 8-byte table reads are immediately followed by a DMA of the decoded ROM address and length (window 0x17F0 with the stored size for compressed entries). In the other 2, a 2 KB read from the sample region lands in between, and the expected asset DMA follows it ([log 356619] then [log 356621]; [log 357563] then [log 357565]). The first table read is entry 0x2BD [log 339662], matching `asset_load(0x2bd)` in `boot_init`. A separate attract-mode run (ad hoc script, not in the repo) gave 1591 of 1591.
 
 ### Region summary [rom, via the decoder]
 
