@@ -72,8 +72,21 @@ class Symbol:
 SYMBOL_LINE = re.compile(r"^(\w+)\s*=\s*(0x[0-9A-Fa-f]+);\s*(?://(.*))?$")
 
 
-def load_symbols(path: Path = ROOT / "symbols.txt") -> list[Symbol]:
-    """splat symbol_addrs format: `name = 0xVRAM; // type:func rom:0xOFFSET`. rom: is required inside overlays."""
+def load_symbols() -> list[Symbol]:
+    """Every symbols*.txt in splat symbol_addrs format: `name = 0xVRAM; // type:func rom:0xOFFSET`.
+
+    rom: is required inside overlays. A name defined twice is an error.
+    """
+    out = []
+    for path in sorted(ROOT.glob("symbols*.txt")):
+        out += parse_symbols(path)
+    dupes = {s.name for s in out if sum(t.name == s.name for t in out) > 1}
+    if dupes:
+        raise ValueError(f"symbols defined twice: {sorted(dupes)}")
+    return out
+
+
+def parse_symbols(path: Path) -> list[Symbol]:
     out = []
     for n, line in enumerate(path.read_text().splitlines(), 1):
         line = line.strip()
@@ -81,7 +94,7 @@ def load_symbols(path: Path = ROOT / "symbols.txt") -> list[Symbol]:
             continue
         m = SYMBOL_LINE.match(line)
         if not m:
-            raise ValueError(f"symbols.txt:{n}: unparsable line: {line}")
+            raise ValueError(f"{path.name}:{n}: unparsable line: {line}")
         attrs = dict(a.split(":", 1) for a in (m.group(3) or "").split() if ":" in a)
         rom = int(attrs["rom"], 0) if "rom" in attrs else None
         out.append(Symbol(m.group(1), int(m.group(2), 0), attrs.get("type", "func"), rom))

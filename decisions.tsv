@@ -11,3 +11,7 @@ ts	phase	decision	why	evidence	result
 2026-11-07T06:00:24Z	layout	segments.toml is the single layout source; build.py emits one ELF per overlay view	overlays share RAM so they cannot sit in one address space	segments.toml, tools/layout.py, tools/build.py	3 views; rebuild is byte-identical
 2026-11-07T06:00:24Z	layout	deleted rom2elf.py	build.py replaces it	git rm tools/rom2elf.py	done
 2026-11-07T06:00:24Z	layout	checked REA opens a multi-PT_LOAD view and decompiles overlay code	REA might refuse more than one segment	decompile race.elf 0x80025c80	VERIFIED
+2026-11-07T06:03:12Z	symbols	classifier blocked building n64sym; reimplemented its matcher in Python and read only its .sig data	running fetched code is the unsafe part; the signature data is plain text	tools/libsigs.py, n64sym ccf4600 src/builtin_signatures.sig	matcher reproduces osCreateThread crcA/crcB exactly
+2026-11-07T06:03:12Z	symbols	dropped names that land on two addresses or addresses with two names	tiny signatures matched everywhere (n_alSynFreeFX 24 times)	build/libsigs.err	33 ambiguous names dropped
+2026-11-07T06:03:12Z	symbols	set minimum signature size to 0x30	0x20 named a generic f(){g(0);} wrapper in an overlay osAfterPreNMI	objdump 0x80035D90; counts 0x20=142 0x30=138 0x40=133	138 names, all in main 0x8011F000-0x8012F000
+2026-11-07T06:03:12Z	symbols	symbols*.txt in splat format feed REA seed files per view	names must persist across ephemeral REA sessions	tools/layout.py load_symbols, build/race.seeds.tsv	REA decompile shows osCreateThread, osStartThread
