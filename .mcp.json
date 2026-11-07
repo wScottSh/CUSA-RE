@@ -2,12 +2,16 @@
   "mcpServers": {
     "rea": {
       "command": "/home/wscottsh/tools/node-v24.22.1-linux-x64/bin/node",
-      "args": ["/home/wscottsh/repos/rea/scripts/rea.mjs", "mcp"],
+      "args": [
+        "/home/wscottsh/repos/rea/scripts/rea.mjs",
+        "mcp"
+      ],
       "env": {
         "GHIDRA_INSTALL_DIR": "/home/wscottsh/tools/ghidra_12.1.4_PUBLIC",
         "REA_ANALYSIS_PROVIDER": "ghidra",
         "REA_GHIDRA_LANGUAGE_ID": "MIPS:BE:64:64-32addr",
-        "PATH": "/home/wscottsh/tools/node-v24.22.1-linux-x64/bin:/usr/local/bin:/usr/bin:/bin"
+        "PATH": "/home/wscottsh/tools/node-v24.22.1-linux-x64/bin:/usr/local/bin:/usr/bin:/bin",
+        "REA_GHIDRA_SEED_FILE": "/home/wscottsh/repos/CUSA-RE/build/resident.seeds.tsv"
       }
     }
   }

@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from layout import ROM_PATH, Segment, load_layout
 
 FIELD_MASK = {".hi16": 0xFFFF0000, ".lo16": 0xFFFF0000, ".targ26": 0xFC000000}
+# Shorter signatures matched generic wrappers in game code (decisions.tsv).
 MIN_SIZE = 0x30
 LOCAL = re.compile(r"_(text|data|rodata|bss)_[0-9A-F]{4}$")
 

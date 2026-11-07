@@ -4,17 +4,14 @@
 usage: check.py [--rea]     --rea also decompiles entry through REA (about 15 s)
 """
 import hashlib
-import os
 import subprocess
 import sys
-from pathlib import Path
 
 from layout import ROM_PATH, ROOT, load_layout, load_symbols
 
 CODE_BLOCK = 0x1000
 CODE_MARKERS = 4
 JAL_CLOSURE = 0.95
-HOME = Path.home()
 
 
 def word(rom: bytes, off: int) -> int:
@@ -91,18 +88,8 @@ def check_reproducible() -> list[str]:
 
 
 def check_rea() -> list[str]:
-    env = dict(
-        os.environ,
-        PATH=f"{HOME}/tools/node-v24.22.1-linux-x64/bin:{os.environ['PATH']}",
-        GHIDRA_INSTALL_DIR=f"{HOME}/tools/ghidra_12.1.4_PUBLIC",
-        REA_GHIDRA_LANGUAGE_ID="MIPS:BE:64:64-32addr",
-        REA_GHIDRA_SEED_FILE=str(ROOT / "build/race.seeds.tsv"),
-    )
-    out = subprocess.run(
-        ["node", f"{HOME}/repos/rea/scripts/rea.mjs", "decompile", str(ROOT / "build/race.elf"), "entry",
-         "--provider", "ghidra", "--format", "json"],
-        env=env, capture_output=True, text=True,
-    ).stdout
+    out = subprocess.run([str(ROOT / "tools/rea"), "race", "decompile", "entry", "--format", "json"],
+                         capture_output=True, text=True).stdout
     return [] if "osCreateThread(" in out else ["REA decompile of entry does not show seeded names"]
 
 

@@ -5,7 +5,8 @@ REA has no N64 lane. Its legacy MIPS ELF lane admits ELF32 BE ET_EXEC with
 e_flags = 0 and no ABI-flags record, so each view is written in that shape:
 two PT_LOADs per segment (text R-X, data RW- with BSS as memsz), bytes from the ROM.
 
-usage: build.py            writes build/<view>.elf and build/<view>.seeds.tsv
+usage: build.py   writes build/<view>.elf, build/<view>.seeds.tsv, and build/resident.seeds.tsv
+                  (resident names only, valid for every view; the MCP server uses it)
 """
 import hashlib
 import struct
@@ -16,8 +17,6 @@ from layout import ROM_PATH, ROOT, Layout, Segment, Symbol, load_layout, load_sy
 OUT = ROOT / "build"
 EHDR, PHDR, ALIGN = 52, 32, 0x10
 SEED_KIND = {"func": "function", "label": "label", "data": "label"}
-
-
 PF_X, PF_W, PF_R = 1, 2, 4
 
 
@@ -74,6 +73,7 @@ def main() -> None:
         (OUT / f"{name}.elf").write_bytes(write_elf(layout.entry, view, rom))
         (OUT / f"{name}.seeds.tsv").write_text(seeds(view, symbols))
         print(f"build/{name}.elf: {' + '.join(s.name for s in view)}")
+    (OUT / "resident.seeds.tsv").write_text(seeds(layout.residents, symbols))
 
 
 if __name__ == "__main__":

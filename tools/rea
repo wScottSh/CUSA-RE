@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Run an REA command against one ELF view with its seed file: tools/rea VIEW COMMAND [ARGS...]
+set -euo pipefail
+root=$(cd "$(dirname "$0")/.." && pwd)
+view=$1 command=$2
+shift 2
+export PATH="$HOME/tools/node-v24.22.1-linux-x64/bin:$PATH"
+export GHIDRA_INSTALL_DIR="$HOME/tools/ghidra_12.1.4_PUBLIC"
+export REA_GHIDRA_LANGUAGE_ID="MIPS:BE:64:64-32addr"
+export REA_GHIDRA_SEED_FILE="$root/build/$view.seeds.tsv"
+exec node "$HOME/repos/rea/scripts/rea.mjs" "$command" "$root/build/$view.elf" --provider ghidra "$@"
