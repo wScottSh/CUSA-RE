@@ -20,7 +20,9 @@ Each item is a check a script or command can run.
 
 All six done-items pass. `tools/check.py --rea` covers 1, 3, 4 and 5. `tools/verify_runtime.py` covers 2. `docs/architecture.md` covers 6.
 
-- Code layout comes from the game's overlay table at 0x801321D0 and matches emulator RAM (100% text match per segment).
+- Code layout comes from the game's overlay table at 0x801321D0. Each segment's text matches emulator RAM 100% at the checkpoint where it is loaded. `low` is overwritten after boot and reloaded on demand, and `ovl_boot` is replaced by the frontend.
+- jal closure counts a target as mapped when it lies in the view's segments, not only at function starts. One call (main 0x8011425C to 0x80038B2C) counts as mapped in the frontend view by address overlap alone; it is only valid with ovl_race loaded.
+- Predicate 1 is a code-marker heuristic. Code hidden in compressed assets would not be flagged.
 - 138 libultra names come from signatures, and about 40 hand names come from reading code.
 - The asset table at ROM 0x80480 (12518 entries) is decoded and checked against two DMA logs.
 
