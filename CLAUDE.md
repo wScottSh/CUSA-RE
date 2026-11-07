@@ -2,6 +2,8 @@
 
 ROM: `ROM/Cruis'n USA.z64` (big-endian, 8 MiB, SHA-1 `54a875ee0b482036fa401a6bc2b242699f0259f7`). Never commit ROM bytes or anything derived from them (`build/` is ignored).
 
+**Push after every commit** (`git push origin main`). Standing order from the repo owner. The repo is public on GitHub.
+
 ## Sources of truth
 - `segments.toml`: the code layout. Every tool reads it through `tools/layout.py`. Change layout only here.
 - `symbols.txt`: hand-written names, splat `symbol_addrs` format. Overlay symbols need `rom:0xOFFSET`, because three overlays share 0x80025C80.
