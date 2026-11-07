@@ -35,3 +35,4 @@ ts	phase	decision	why	evidence	result
 2026-11-07T06:25:22Z	frame	added the user's standing order on classifier blocks to ~/.claude/CLAUDE.md	user asked for it as a standing order	~/.claude/CLAUDE.md Working discipline	done (outside this repo)
 2026-11-07T06:25:22Z	runtime	pivoted input script: A presses at the title did nothing; Start at the title plus A through menus reached a race	first scripted run stayed in attract mode	navgrid vs ggrid screenshots (deleted with build/rt); tools/to_race.script	race reached
 2026-11-07T06:25:22Z	symbols	rewrote libsigs scan after the first draft keyed crcA lookup before masking	crcA depends on each signature's own relocation mask	commit acecbab	matcher reproduces osCreateThread exactly
+2026-11-07T06:25:38Z	audit	supersedes the 'start' row above: this run created the log, so no start row applies	start rows are reserved for a run resuming another run's log	decisions.tsv	corrected
