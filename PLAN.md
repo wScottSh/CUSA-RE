@@ -16,12 +16,13 @@ Each item is a check a script or command can run.
 5. **libultra is named.** Library functions are named in `symbols.txt`, and REA output shows the names.
 6. **Architecture is documented.** `docs/architecture.md` covers boot, threads, segment loading and ROM layout. Each claim cites an address.
 
-## Findings so far
+## Status
 
-- ROM 0x1000..0x3D860 is the boot segment at 0x80100000, uncompressed, BSS 0x8013C860 + 0x28FE0.
-- Code markers continue to about ROM 0x82000. Code at ROM 0x3D860 starts with a prologue.
-- That code's `jal` targets cluster at 0x80020000..0x80045000, and two different base offsets each explain part of them. Likely overlays sharing RAM. Static fitting is ambiguous, so runtime snapshots decide.
-- ROM 0x750000..end is zero padding. 0x90000..0x750000 is data, much of it high entropy (compressed or audio).
+All six done-items pass. `tools/check.py --rea` covers 1, 3, 4 and 5. `tools/verify_runtime.py` covers 2. `docs/architecture.md` covers 6.
+
+- Code layout comes from the game's overlay table at 0x801321D0 and matches emulator RAM (100% text match per segment).
+- 138 libultra names come from signatures, and about 40 hand names come from reading code.
+- The asset table at ROM 0x80480 (12518 entries) is decoded and checked against two DMA logs.
 
 ## Phases
 

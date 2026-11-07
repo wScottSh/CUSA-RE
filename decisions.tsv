@@ -25,3 +25,6 @@ ts	phase	decision	why	evidence	result
 2026-11-07T06:12:01Z	tooling	MCP server gets resident-only seeds	MCP env can't vary per view; overlay names would mislabel other views	.mcp.json, build/resident.seeds.tsv	139 resident names
 2026-11-07T06:12:01Z	docs	dumped all pseudocode with decompile-all and delegated architecture notes to one subagent	reading hundreds of functions would flood the main context	build/c/*, agent brief in transcript	open
 2026-11-07T06:12:01Z	cleanup	deslop pass on tools	poteto mandate before commit	commit 527b4d4	2 cosmetic edits; libsigs output identical
+2026-11-07T06:21:51Z	docs	accepted the subagent's architecture notes and 39 names after spot checks	own the delegated work: checked ovl_copy table access, dma_thread args, cross-call bytes, asset math	docs/architecture.md, symbols.txt, objdump 0x801002D0, ROM 0x5159C	all spot checks match; check.py --rea 6/6 ok
+2026-11-07T06:21:51Z	docs	moved the agent's asset decoder into tools/assets.py and reran it on two logs	the 2516/2518 claim needed a rerunnable check, and a second log is independent evidence	tools/assets.py; game.pilog 2516/2518, nav.pilog 1591/1591	VERIFIED
+2026-11-07T06:21:51Z	docs	verify_runtime.py now records its DMA log	doc cites line numbers of an ad hoc log; a committed run should produce the same log	tools/verify_runtime.py	open: comparing logs
