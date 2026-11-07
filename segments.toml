@@ -1,4 +1,4 @@
-# Code layout of Cruis'n USA (U). Single source of truth for every tool.
+# Code layout of Cruis'n USA (U).
 #
 # Segments marked overlay = true share RAM, so each gets its own ELF view
 # holding it plus every resident segment.
@@ -6,7 +6,6 @@
 # table_index refers to the game's own overlay table at 0x801321D0
 # (six words per entry: rom_start, rom_end, vram, vram_end, bss_start, bss_end).
 # text_end: CPU code ends here; data follows up to bss[0].
-# tools/check.py verifies every value here against that table and the ROM.
 
 rom_sha1 = "54a875ee0b482036fa401a6bc2b242699f0259f7"
 entry = 0x80100000

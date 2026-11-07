@@ -11,6 +11,7 @@ usage: build.py   writes build/<view>.elf, build/<view>.seeds.tsv, and build/res
 import hashlib
 import struct
 import sys
+from typing import NamedTuple
 
 from layout import ROM_PATH, ROOT, Layout, Segment, Symbol, load_layout, load_symbols
 
@@ -20,21 +21,28 @@ SEED_KIND = {"func": "function", "label": "label", "data": "label"}
 PF_X, PF_W, PF_R = 1, 2, 4
 
 
-def loads(s: Segment) -> list[tuple[int, int, int, int, int]]:
-    """(rom_start, rom_end, vram, memsz, flags): text is R-X, data and BSS are RW-."""
-    text = (s.rom_start, s.text_rom_end, s.vram, s.text_end - s.vram, PF_R | PF_X)
-    data = (s.text_rom_end, s.rom_end, s.text_end, s.bss_end - s.text_end, PF_R | PF_W)
-    return [text, data] if data[3] else [text]
+class Load(NamedTuple):
+    rom_start: int
+    rom_end: int
+    vram: int
+    memsz: int
+    flags: int
+
+
+def loads(s: Segment) -> list[Load]:
+    text = Load(s.rom_start, s.text_rom_end, s.vram, s.text_end - s.vram, PF_R | PF_X)
+    data = Load(s.text_rom_end, s.rom_end, s.text_end, s.bss_end - s.text_end, PF_R | PF_W)
+    return [text, data] if data.memsz else [text]
 
 
 def write_elf(entry: int, segments: tuple[Segment, ...], rom: bytes) -> bytes:
     parts = [p for s in segments for p in loads(s)]
     data_off = (EHDR + PHDR * len(parts) + ALIGN - 1) & ~(ALIGN - 1)
     phdrs, body = b"", b""
-    for start, end, vram, memsz, flags in parts:
+    for p in parts:
         off = data_off + len(body)
-        phdrs += struct.pack(">8I", 1, off, vram, vram, end - start, memsz, flags, ALIGN)
-        body += rom[start:end]
+        phdrs += struct.pack(">8I", 1, off, p.vram, p.vram, p.rom_end - p.rom_start, p.memsz, p.flags, ALIGN)
+        body += rom[p.rom_start:p.rom_end]
         body += b"\0" * (-len(body) % ALIGN)
     ehdr = struct.pack(
         ">16sHHIIIIIHHHHHH",

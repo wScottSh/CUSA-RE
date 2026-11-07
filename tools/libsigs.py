@@ -68,7 +68,6 @@ def head_mask(sig: Sig) -> tuple[tuple[str, int], ...]:
 
 
 def scan(seg: Segment, rom: bytes, sigs: list[Sig]) -> list[tuple[int, str]]:
-    """(vram, name) for every confident match and the named jal targets inside it."""
     code = rom[seg.rom_start:seg.rom_end]
     index: dict[tuple, dict[int, list[Sig]]] = {}
     for s in sigs:
@@ -82,15 +81,21 @@ def scan(seg: Segment, rom: bytes, sigs: list[Sig]) -> list[tuple[int, str]]:
                 if off + sig.size > len(code) or zlib.crc32(masked(code[off:off + sig.size], sig)) != sig.crc_b:
                     continue
                 found.append((seg.vram + off, sig.name))
-                for kind, target, roff in sig.relocs:
-                    if kind == ".targ26" and not LOCAL.search(target):
-                        w = int.from_bytes(code[off + roff:off + roff + 4], "big")
-                        found.append(((seg.vram & 0xF0000000) | (w & 0x03FFFFFF) << 2, target))
+                found += called_functions(code, off, seg.vram, sig)
     return found
 
 
+def called_functions(code: bytes, off: int, vram: int, sig: Sig) -> list[tuple[int, str]]:
+    """Name the targets of the matched function's jal relocations that point at named functions."""
+    out = []
+    for kind, target, roff in sig.relocs:
+        if kind == ".targ26" and not LOCAL.search(target):
+            w = int.from_bytes(code[off + roff:off + roff + 4], "big")
+            out.append(((vram & 0xF0000000) | (w & 0x03FFFFFF) << 2, target))
+    return out
+
+
 def unambiguous(found: list[tuple[Segment, int, str]]) -> list[tuple[Segment, int, str]]:
-    """Keep only names with one address and addresses with one name."""
     uniq = set(found)
     by_name, by_addr = {}, {}
     for seg, vram, name in uniq:

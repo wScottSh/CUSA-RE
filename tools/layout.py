@@ -1,4 +1,4 @@
-"""Parse segments.toml and symbols.txt into typed records. Every tool goes through here."""
+"""Parse segments.toml and symbols.txt into typed records."""
 import re
 import tomllib
 from dataclasses import dataclass

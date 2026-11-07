@@ -6,3 +6,4 @@ build/
 *.elf
 .claude/skills/
 todo.md
+__pycache__/
