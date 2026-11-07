@@ -1,0 +1,2 @@
+// splat symbol_addrs format. Overlay symbols need rom:0xOFFSET.
+entry = 0x80100000; // type:func

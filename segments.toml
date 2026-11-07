@@ -1,0 +1,55 @@
+# Code layout of Cruis'n USA (U). Single source of truth for every tool.
+#
+# Segments marked overlay = true share RAM, so each gets its own ELF view
+# holding it plus every resident segment.
+#
+# table_index refers to the game's own overlay table at 0x801321D0
+# (six words per entry: rom_start, rom_end, vram, vram_end, bss_start, bss_end).
+# tools/check.py verifies every value here against that table and the ROM.
+
+rom_sha1 = "54a875ee0b482036fa401a6bc2b242699f0259f7"
+entry = 0x80100000
+overlay_table = 0x801321D0
+
+# Copied by the IPL3 boot code (1 MiB from ROM 0x1000). BSS bounds come from
+# the clear loop at the entry point.
+[[segment]]
+name = "main"
+rom = [0x1000, 0x3D860]
+vram = 0x80100000
+bss = [0x8013C860, 0x80165840]
+
+# Reloaded from ROM many times per session (runtime DMA log).
+[[segment]]
+name = "low"
+table_index = 1
+rom = [0x7F110, 0x80480]
+vram = 0x80000480
+bss = [0x800017F0, 0x8000AA50]
+
+# Loaded once, before the first logo is drawn.
+[[segment]]
+name = "ovl_boot"
+overlay = true
+table_index = 0
+rom = [0x3D860, 0x3E6F0]
+vram = 0x80025C80
+bss = [0x80026B10, 0x80026B20]
+
+# Resident from the intro through attract mode and the race-setup menus.
+[[segment]]
+name = "ovl_frontend"
+overlay = true
+table_index = 3
+rom = [0x5EA10, 0x7F110]
+vram = 0x80025C80
+bss = [0x80046380, 0x800501F0]
+
+# Loaded when a race starts; never loaded in attract mode.
+[[segment]]
+name = "ovl_race"
+overlay = true
+table_index = 2
+rom = [0x3E6F0, 0x5EA10]
+vram = 0x80025C80
+bss = [0x80045FA0, 0x80067960]

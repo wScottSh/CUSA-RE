@@ -1,0 +1,13 @@
+ts	phase	decision	why	evidence	result
+2026-11-07T05:48:29Z	frame	wrapped boot segment in an ELF so REA can open it	REA has no N64 or raw MIPS support	tools/rom2elf.py, commit 11497f7	decompile entry works
+2026-11-07T05:48:29Z	frame	scanned ROM in 64KB blocks for code markers	needed to know how much code sits outside the boot segment	transcript, block scan	code continues to ROM ~0x82000; second segment starts at 0x3D860
+2026-11-07T05:48:29Z	frame	dropped static base-fitting for segment 2	two bases each explain part of the jal targets, so the answer is ambiguous	fit: 0x7ffe7590 225/507, 0x7ffc7270 181/507	switch to runtime RDRAM snapshots
+2026-11-07T05:48:29Z	frame	build ares n64-run out of tree in ~/tools	headless boot plus savestates gives runtime truth without touching the ares repo	~/tools/ares-n64run-build	open
+2026-11-07T06:00:24Z	runtime	built ares n64-run out of tree and booted the ROM headless	runtime state is the authority for what code lands where	~/tools/ares-n64run-build, build/rt/strip.png	boots, renders logos and controller screen
+2026-11-07T06:00:24Z	runtime	wrote segscan.py to match RDRAM in save states against the ROM	a rerunnable tool instead of eyeballing hex	tools/segscan.py	runs in ~1s per state
+2026-11-07T06:00:24Z	runtime	logged PI DMAs with ARES_PILOG while driving input scripts into a real race	the DMA log names every ROM range copied to RAM	build/rt/game.pilog, build/rt/ggrid.png	race reached; 4 code DMAs plus boot
+2026-11-07T06:00:24Z	layout	found the game's overlay table at 0x801321D0, 4 entries of 6 words	matches every runtime DMA, so the layout comes from the game itself	ROM 0x331D0, game.pilog	3 overlays share 0x80025C80; low segment at 0x80000480
+2026-11-07T06:00:24Z	layout	named overlays boot/frontend/race from when they load	ovl 3 stays loaded through attract and menus; ovl 2 loads only at race start	nav.pilog vs game.pilog, segscan g08/g23	names rest on load timing, not code reading yet
+2026-11-07T06:00:24Z	layout	segments.toml is the single layout source; build.py emits one ELF per overlay view	overlays share RAM so they cannot sit in one address space	segments.toml, tools/layout.py, tools/build.py	3 views; rebuild is byte-identical
+2026-11-07T06:00:24Z	layout	deleted rom2elf.py	build.py replaces it	git rm tools/rom2elf.py	done
+2026-11-07T06:00:24Z	layout	checked REA opens a multi-PT_LOAD view and decompiles overlay code	REA might refuse more than one segment	decompile race.elf 0x80025c80	VERIFIED

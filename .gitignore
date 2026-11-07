@@ -5,3 +5,4 @@ build/
 *.v64
 *.elf
 .claude/skills/
+todo.md
