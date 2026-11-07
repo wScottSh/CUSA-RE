@@ -3,7 +3,7 @@
 
 REA has no N64 lane. Its legacy MIPS ELF lane admits ELF32 BE ET_EXEC with
 e_flags = 0 and no ABI-flags record, so each view is written in that shape:
-one PT_LOAD per segment, file bytes copied from the ROM, BSS as memsz.
+two PT_LOADs per segment (text R-X, data RW- with BSS as memsz), bytes from the ROM.
 
 usage: build.py            writes build/<view>.elf and build/<view>.seeds.tsv
 """
@@ -18,18 +18,29 @@ EHDR, PHDR, ALIGN = 52, 32, 0x10
 SEED_KIND = {"func": "function", "label": "label", "data": "label"}
 
 
+PF_X, PF_W, PF_R = 1, 2, 4
+
+
+def loads(s: Segment) -> list[tuple[int, int, int, int, int]]:
+    """(rom_start, rom_end, vram, memsz, flags): text is R-X, data and BSS are RW-."""
+    text = (s.rom_start, s.text_rom_end, s.vram, s.text_end - s.vram, PF_R | PF_X)
+    data = (s.text_rom_end, s.rom_end, s.text_end, s.bss_end - s.text_end, PF_R | PF_W)
+    return [text, data] if data[3] else [text]
+
+
 def write_elf(entry: int, segments: tuple[Segment, ...], rom: bytes) -> bytes:
-    data_off = (EHDR + PHDR * len(segments) + ALIGN - 1) & ~(ALIGN - 1)
+    parts = [p for s in segments for p in loads(s)]
+    data_off = (EHDR + PHDR * len(parts) + ALIGN - 1) & ~(ALIGN - 1)
     phdrs, body = b"", b""
-    for s in segments:
+    for start, end, vram, memsz, flags in parts:
         off = data_off + len(body)
-        phdrs += struct.pack(">8I", 1, off, s.vram, s.vram, s.size, s.bss_end - s.vram, 7, ALIGN)
-        body += rom[s.rom_start:s.rom_end]
+        phdrs += struct.pack(">8I", 1, off, vram, vram, end - start, memsz, flags, ALIGN)
+        body += rom[start:end]
         body += b"\0" * (-len(body) % ALIGN)
     ehdr = struct.pack(
         ">16sHHIIIIIHHHHHH",
         b"\x7fELF\x01\x02\x01" + b"\0" * 9,
-        2, 8, 1, entry, EHDR, 0, 0, EHDR, PHDR, len(segments), 0, 0, 0,
+        2, 8, 1, entry, EHDR, 0, 0, EHDR, PHDR, len(parts), 0, 0, 0,
     )
     head = ehdr + phdrs
     return head + b"\0" * (data_off - len(head)) + body

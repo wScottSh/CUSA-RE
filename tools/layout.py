@@ -14,6 +14,7 @@ class Segment:
     rom_start: int
     rom_end: int
     vram: int
+    text_end: int
     bss_start: int
     bss_end: int
     overlay: bool
@@ -22,6 +23,10 @@ class Segment:
     @property
     def size(self) -> int:
         return self.rom_end - self.rom_start
+
+    @property
+    def text_rom_end(self) -> int:
+        return self.rom_start + self.text_end - self.vram
 
     def holds_rom(self, rom: int) -> bool:
         return self.rom_start <= rom < self.rom_end
@@ -54,9 +59,9 @@ def load_layout(path: Path = ROOT / "segments.toml") -> Layout:
     raw = tomllib.loads(path.read_text())
     segs = []
     for s in raw["segment"]:
-        seg = Segment(s["name"], *s["rom"], s["vram"], *s["bss"], s.get("overlay", False), s.get("table_index"))
-        if seg.vram + seg.size != seg.bss_start or seg.bss_end < seg.bss_start:
-            raise ValueError(f"{seg.name}: vram + size must equal bss_start")
+        seg = Segment(s["name"], *s["rom"], s["vram"], s["text_end"], *s["bss"], s.get("overlay", False), s.get("table_index"))
+        if not seg.vram < seg.text_end <= seg.bss_start == seg.vram + seg.size <= seg.bss_end:
+            raise ValueError(f"{seg.name}: need vram < text_end <= bss_start == vram + size <= bss_end")
         segs.append(seg)
     return Layout(raw["rom_sha1"], raw["entry"], raw["overlay_table"], tuple(segs))
 

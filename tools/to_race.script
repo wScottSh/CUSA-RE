@@ -1,0 +1,114 @@
+# Cold boot to a race: skip the controller notice, wait for the title,
+# press Start, then A through game select, track, transmission and car.
+wait 30
+save-state boot.bst
+wait 250
+input Start
+wait 6
+input
+wait 54
+input Start
+wait 6
+input
+wait 1300
+input Start
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+save-state frontend.bst
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+input A
+wait 6
+input
+wait 54
+save-state race.bst
+shot race.ppm
+wait 1
+stop
