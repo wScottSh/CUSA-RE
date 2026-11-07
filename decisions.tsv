@@ -21,3 +21,7 @@ ts	phase	decision	why	evidence	result
 2026-11-07T06:09:07Z	checks	fixed text_end check for a nop delay slot, and coverage now scans exact gaps	ovl_boot ends in jr ra; nop, and 4KB blocks starting inside a segment hid gaps	tools/check.py	mutations caught: text_end+0x10, deleting the low segment
 2026-11-07T06:09:07Z	checks	wrote verify_runtime.py with a committed input script to a race	predicate 2 must rerun from cold boot, not from my ad hoc states	tools/verify_runtime.py, tools/to_race.script, build/runtime/race.png	all 5 segments 100% text match in their checkpoint, ~0% elsewhere
 2026-11-07T06:09:07Z	layout	noted one cross-segment call: main 0x8011425C jal 0x80038B2C in the overlay slot	only unmapped jal in the boot view	check.py output	document in architecture notes
+2026-11-07T06:12:01Z	tooling	tools/rea wraps REA env and per-view seeds; check.py uses it	env setup was duplicated between shell and check.py	tools/rea, commit 527b4d4	check --rea passes
+2026-11-07T06:12:01Z	tooling	MCP server gets resident-only seeds	MCP env can't vary per view; overlay names would mislabel other views	.mcp.json, build/resident.seeds.tsv	139 resident names
+2026-11-07T06:12:01Z	docs	dumped all pseudocode with decompile-all and delegated architecture notes to one subagent	reading hundreds of functions would flood the main context	build/c/*, agent brief in transcript	open
+2026-11-07T06:12:01Z	cleanup	deslop pass on tools	poteto mandate before commit	commit 527b4d4	2 cosmetic edits; libsigs output identical
