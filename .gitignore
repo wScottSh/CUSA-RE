@@ -1,0 +1,7 @@
+ROM/
+build/
+*.z64
+*.n64
+*.v64
+*.elf
+.claude/skills/
